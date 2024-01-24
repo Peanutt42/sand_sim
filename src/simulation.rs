@@ -1,4 +1,4 @@
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum PixelState {
 	Empty,
 	Sand,
@@ -20,50 +20,60 @@ impl Simulation {
 		}
     }
 
+	fn swap(&mut self, a: usize, b: usize) {
+		let tmp = self.grid[a].clone();
+        self.grid[a] = self.grid[b];
+        self.grid[b] = tmp;
+	}
+
+	fn is_empty(&self, index: usize) -> bool {
+		if index >= self.grid.len() {
+			return true;
+		}
+		self.grid[index] == PixelState::Empty
+	}
+
+	pub fn update_pixel(&mut self, x: usize, y: usize) {
+		match self.grid[x + y * self.width] {
+			PixelState::Sand => {
+				if y == self.height - 1 {
+					return;
+				}
+
+				let index = x + y * self.width;
+
+				let below = index + self.width;
+				let below_left = below - 1;
+				let below_right = below + 1;
+
+				if self.is_empty(below) {
+					self.swap(index, below);
+				}
+				else if x > 0 && self.is_empty(below_left) {
+					self.swap(index, below_left);
+				}
+				else if x + 1 < self.width && self.is_empty(below_right) {
+					self.swap(index, below_right);
+				}
+			},
+			_ => {},
+		}
+	}
+
 	pub fn update(&mut self) {
-		let mut updated_grid = vec![PixelState::Empty; self.width * self.height];
-
-		for y in 0..self.height {
-			for x in 0..self.width {
-				match self.grid[x + y * self.width] {
-					PixelState::Sand => {
-						if y == self.height - 1 {
-							updated_grid[x + y * self.width] = PixelState::Sand;
-							continue;
-						}
-
-						let below = &self.grid[x + (y + 1) * self.width];
-						let mut below_left: Option<&PixelState> = None;
-						let mut below_right: Option<&PixelState> = None;
-						if x > 0 {
-							below_left = Some(&self.grid[x - 1 + (y + 1) * self.width]);
-						}
-						if x + 1 < self.width {
-							below_right = Some(&self.grid[x + 1 + (y + 1) * self.width]);
-						}
-						if *below == PixelState::Empty {
-							updated_grid[x + y * self.width] = PixelState::Empty;
-							updated_grid[x + (y + 1) * self.width] = PixelState::Sand;
-						}
-						else if below_left.is_some() && *below_left.unwrap() == PixelState::Empty {
-                            updated_grid[x - 1 + (y + 1) * self.width] = PixelState::Sand;
-                        }
-						else if below_right.is_some() && *below_right.unwrap() == PixelState::Empty {
-                            updated_grid[x + 1 + (y + 1) * self.width] = PixelState::Sand;
-                        }
-						else {
-							updated_grid[x + y * self.width] = PixelState::Sand;
-						}
-					},
-					PixelState::Stone => {
-						updated_grid[x + y * self.width] = PixelState::Stone;
-					}
-					_ => {},
+		for y in (0..self.height).rev() {
+			let left_to_right = y % 2 == 0;
+			if left_to_right {
+				for x in 0..self.width {
+                    self.update_pixel(x, y);
+                }
+			}
+			else {
+				for x in (0..self.width).rev() {
+					self.update_pixel(x, y);
 				}
 			}
 		}
-
-		self.grid = updated_grid;
 	}
 
 	pub fn draw_to_buffer(&self, buffer: &mut Vec<u32>) {
