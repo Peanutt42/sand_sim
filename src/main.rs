@@ -36,11 +36,28 @@ fn main() {
         }
 
         if window.get_mouse_down(MouseButton::Left) {
-            if let Some((x, y)) = window.get_mouse_pos(MouseMode::Clamp) {
-                let x = x as i32;
-                let y = y as i32;
-                if x >= 0 && x < WIDTH as i32 && y >= 0 && y < HEIGHT as i32 {
-                    simulation.grid[x as usize + y as usize * WIDTH] = PixelState::Sand;
+            if let Some((mouse_x, mouse_y)) = window.get_mouse_pos(MouseMode::Clamp) {
+                let mouse_x = mouse_x as i32;
+                let mouse_y = mouse_y as i32;
+                for y in mouse_y-4..mouse_y+4 {
+                    for x in mouse_x-4..mouse_x+4 {
+                        if x >= 0 && x < WIDTH as i32 && y >= 0 && y < HEIGHT as i32 {
+                            simulation.grid[x as usize + y as usize * WIDTH] = PixelState::Sand;
+                        }
+                    }
+                }
+            }
+        }
+        if window.get_mouse_down(MouseButton::Right) {
+            if let Some((mouse_x, mouse_y)) = window.get_mouse_pos(MouseMode::Clamp) {
+                let mouse_x = mouse_x as i32;
+                let mouse_y = mouse_y as i32;
+                for y in mouse_y-4..mouse_y+4 {
+                    for x in mouse_x-4..mouse_x+4 {
+                        if x >= 0 && x < WIDTH as i32 && y >= 0 && y < HEIGHT as i32 {
+                            simulation.grid[x as usize + y as usize * WIDTH] = PixelState::Stone;
+                        }
+                    }
                 }
             }
         }

@@ -1,8 +1,8 @@
-
 #[derive(Clone, PartialEq)]
 pub enum PixelState {
 	Empty,
 	Sand,
+	Stone,
 }
 
 pub struct Simulation {
@@ -55,6 +55,9 @@ impl Simulation {
 							updated_grid[x + y * self.width] = PixelState::Sand;
 						}
 					},
+					PixelState::Stone => {
+						updated_grid[x + y * self.width] = PixelState::Stone;
+					}
 					_ => {},
 				}
 			}
@@ -72,6 +75,9 @@ impl Simulation {
                     PixelState::Sand => {
                         buffer[x + y * self.width] = 0xFFFFFFFF;
                     },
+					PixelState::Stone => {
+                        buffer[x + y * self.width] = 0x999999FF;
+					},
                     _ => {
                         buffer[x + y * self.width] = 0;
 					},
