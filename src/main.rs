@@ -37,7 +37,11 @@ fn main() {
 
         if window.get_mouse_down(MouseButton::Left) {
             if let Some((x, y)) = window.get_mouse_pos(MouseMode::Clamp) {
-                simulation.grid[x as usize][y as usize] = PixelState::Sand;
+                let x = x as i32;
+                let y = y as i32;
+                if x >= 0 && x < WIDTH as i32 && y >= 0 && y < HEIGHT as i32 {
+                    simulation.grid[x as usize][y as usize] = PixelState::Sand;
+                }
             }
         }
 

@@ -21,22 +21,36 @@ impl Simulation {
     }
 
 	pub fn update(&mut self) {
-		let mut updated_grid = vec![vec![PixelState::Empty; self.height]; self.width];//self.grid.clone();
+		let mut updated_grid = vec![vec![PixelState::Empty; self.height]; self.width];
 
 		for col in 0..self.width {
 			for row in 0..self.height {
 				match self.grid[col][row] {
 					PixelState::Sand => {
-						if row >= self.height - 1 {
+						if row == self.height - 1 {
 							updated_grid[col][row] = PixelState::Sand;
 							continue;
 						}
 
 						let below = &self.grid[col][row + 1];
+						let mut below_left: Option<&PixelState> = None;
+						let mut below_right: Option<&PixelState> = None;
+						if col > 0 {
+							below_left = Some(&self.grid[col - 1][row + 1]);
+						}
+						if col + 1 < self.width {
+							below_right = Some(&self.grid[col + 1][row + 1]);
+						}
 						if *below == PixelState::Empty {
 							updated_grid[col][row] = PixelState::Empty;
 							updated_grid[col][row + 1] = PixelState::Sand;
 						}
+						else if below_left.is_some() && *below_left.unwrap() == PixelState::Empty {
+                            updated_grid[col - 1][row + 1] = PixelState::Sand;
+                        }
+						else if below_right.is_some() && *below_right.unwrap() == PixelState::Empty {
+                            updated_grid[col + 1][row + 1] = PixelState::Sand;
+                        }
 						else {
 							updated_grid[col][row] = PixelState::Sand;
 						}
