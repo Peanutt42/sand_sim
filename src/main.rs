@@ -28,9 +28,9 @@ fn main() {
 
     while window.is_open() {
         if window.is_key_pressed(Key::R, KeyRepeat::No) {
-            for col in 0..simulation.width {
-                for row in 0..simulation.height {
-                    simulation.grid[col][row] = PixelState::Empty;
+            for y in 0..simulation.height {
+                for x in 0..simulation.width {
+                    simulation.grid[x + y * WIDTH] = PixelState::Empty;
                 }
             }
         }
@@ -40,7 +40,7 @@ fn main() {
                 let x = x as i32;
                 let y = y as i32;
                 if x >= 0 && x < WIDTH as i32 && y >= 0 && y < HEIGHT as i32 {
-                    simulation.grid[x as usize][y as usize] = PixelState::Sand;
+                    simulation.grid[x as usize + y as usize * WIDTH] = PixelState::Sand;
                 }
             }
         }
