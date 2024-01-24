@@ -62,7 +62,10 @@ fn main() {
             }
         }
 
-        simulation.update();
+        if !window.is_key_down(Key::Space) {
+            simulation.update();
+        }
+        
         simulation.draw_to_buffer(&mut screen);
 
         if let Err(e) = window.update_with_buffer(&screen, WIDTH, HEIGHT) {
