@@ -52,17 +52,18 @@ fn main() {
             selected_cell_type = Cell::Stone;
         }
 
+        let mouse_pos = window.get_mouse_pos(MouseMode::Clamp);
+        let (window_width, window_height) = window.get_size();
+
         if window.get_mouse_down(MouseButton::Left) {
-            if let Some((mouse_x, mouse_y)) = window.get_mouse_pos(MouseMode::Clamp) {
-                let (window_width, window_height) = window.get_size();
+            if let Some((mouse_x, mouse_y)) = mouse_pos {
                 let mouse_x = (mouse_x * (WIDTH as f32 / window_width as f32)) as i32;
                 let mouse_y = (mouse_y * (HEIGHT as f32 / window_height as f32)) as i32;
                 simulation.set_box(mouse_x, mouse_y, brush_extend, selected_cell_type);
             }
         }
         if window.get_mouse_down(MouseButton::Right) {
-            if let Some((mouse_x, mouse_y)) = window.get_mouse_pos(MouseMode::Clamp) {
-                let (window_width, window_height) = window.get_size();
+            if let Some((mouse_x, mouse_y)) = mouse_pos {
                 let mouse_x = (mouse_x * (WIDTH as f32 / window_width as f32)) as i32;
                 let mouse_y = (mouse_y * (HEIGHT as f32 / window_height as f32)) as i32;
                 simulation.set_box(mouse_x, mouse_y, brush_extend, Cell::Empty);
@@ -74,6 +75,18 @@ fn main() {
         }
         
         simulation.draw_to_buffer(&mut screen);
+
+        if let Some((mouse_x, mouse_y)) = mouse_pos {
+            let mouse_x = (mouse_x * (WIDTH as f32 / window_width as f32)) as i32;
+            let mouse_y = (mouse_y * (HEIGHT as f32 / window_height as f32)) as i32;
+            for y in mouse_x-brush_extend..mouse_x+brush_extend {
+                for x in mouse_y-brush_extend..mouse_y+brush_extend {
+                    if x >= 0 && x < window_width as i32 && y >= 0 && y < window_height as i32 {
+                        screen[x as usize * window_height + y as usize] = 0xFFFFFFFF;
+                    }
+                }
+            }
+        }
 
         if let Err(e) = window.update_with_buffer(&screen, WIDTH, HEIGHT) {
             println!("Failed to update window with buffer: {e}");
