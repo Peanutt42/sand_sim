@@ -3,8 +3,10 @@ A library to simulate falling sand
 
 ## sand_sim_editor
 ### Controls
-- Sand: `Left mouse button`
-- Stone: `Right mouse button`
+- Sand: `1`
+- Stone: `2`
+- Add: `Left mouse button`
+- Remove: `Right mouse button`
 - Reset: `R`
 - Pause: `Space`
 

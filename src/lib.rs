@@ -1,4 +1,5 @@
-use rand::*;
+use rayon::prelude::*;
+use std::sync::RwLock;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum Cell {
@@ -71,40 +72,57 @@ impl Simulation {
 		}
 	}
 
-	pub fn update(&mut self) {
-		let mut changes: Vec<CellMove> = Vec::new();
+	// sets every cell in box to 'cell'
+	pub fn set_box(&mut self, center_x: i32, center_y: i32, extend: i32, cell: Cell) {
+		for y in center_y-extend..center_y+extend {
+			for x in center_x-extend..center_x+extend {
+				if x >= 0 && x < self.width as i32 && y >= 0 && y < self.height as i32 {
+					self.grid[x as usize + y as usize * self.width] = cell;
+				}
+			}
+		}
+	}
 
-		for y in (0..self.height).rev() {
+	pub fn update(&mut self) {
+		let changes: RwLock<Vec<CellMove>> = RwLock::new(Vec::new());
+
+		(0..self.height).into_par_iter()
+		.for_each(|y| {
+			let mut local_changes: Vec<CellMove> = Vec::new();
 			let left_to_right = y % 2 == 0;
 			if left_to_right {
 				for x in 0..self.width {
                     if let Some(cell_move) = self.update_pixel(x, y) {
-						changes.push(cell_move);
+						local_changes.push(cell_move);
 					}
                 }
 			}
 			else {
 				for x in (0..self.width).rev() {
 					if let Some(cell_move) = self.update_pixel(x, y) {
-						changes.push(cell_move);
+						local_changes.push(cell_move);
 					}
 				}
 			}
-		}
+			changes.write().unwrap().append(&mut local_changes);
+		});
 
-		self.commit_changes(changes);
+		self.commit_changes(changes.read().unwrap().clone());
 	}
 
 	fn commit_changes(&mut self, mut changes: Vec<CellMove>) {
 		// removes moves that are not valid
-		for mut i in 0..changes.len() {
+		let mut i = 0;
+		while i < changes.len() {
 			if self.grid[changes[i].destination as usize] != Cell::Empty {
 				changes[i] = *changes.last().unwrap();
 				changes.pop();
-				i -= 1;
 			}
+			else {
+				i += 1;
+            }
 		}
-
+		
 		changes.sort_by(|a, b| a.destination.cmp(&b.destination));
 
 		let mut iprev = 0;

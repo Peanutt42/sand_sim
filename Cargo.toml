@@ -10,3 +10,4 @@ members = [
 
 [dependencies]
 rand = "0.8.5"
+rayon = "1.8"
