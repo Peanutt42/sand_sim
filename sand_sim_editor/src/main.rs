@@ -81,8 +81,8 @@ fn main() {
             let mouse_y = (mouse_y * (HEIGHT as f32 / window_height as f32)) as i32;
             for y in mouse_x-brush_extend..mouse_x+brush_extend {
                 for x in mouse_y-brush_extend..mouse_y+brush_extend {
-                    if x >= 0 && x < window_width as i32 && y >= 0 && y < window_height as i32 {
-                        screen[x as usize * window_height + y as usize] = 0xFFFFFFFF;
+                    if x >= 0 && x < WIDTH as i32 && y >= 0 && y < HEIGHT as i32 {
+                        screen[x as usize * HEIGHT + y as usize] = 0xFFFFFFFF;
                     }
                 }
             }
