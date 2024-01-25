@@ -1,3 +1,4 @@
+use rand::Rng;
 use rayon::prelude::*;
 use std::sync::RwLock;
 
@@ -122,14 +123,14 @@ impl Simulation {
 				i += 1;
             }
 		}
-		
-		changes.sort_by(|a, b| a.destination.cmp(&b.destination));
+
+		let mut thread_rng = rand::thread_rng();
 
 		let mut iprev = 0;
 		changes.push(CellMove{ destination: -1, source: -1 });
 		for i in 0..changes.len()-1 {
 			if changes[i + 1].destination != changes[i].destination {
-				let rand = iprev + (rand::random::<usize>() % (i-iprev+1));
+				let rand = iprev + (thread_rng.gen::<usize>() % (i-iprev+1));
 				let dst = changes[rand].destination.clone();
 				let src = changes[rand].source.clone();
 				self.grid[dst as usize] = self.grid[src as usize];
