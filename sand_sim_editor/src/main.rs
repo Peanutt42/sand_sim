@@ -2,8 +2,7 @@ use core::panic;
 
 use minifb::{Window, WindowOptions, Key, KeyRepeat, MouseButton, MouseMode};
 
-mod simulation;
-use simulation::{Simulation, PixelState};
+use sand_sim::{Simulation, PixelState};
 
 fn main() {
 	if cfg!(debug_assertions) {
