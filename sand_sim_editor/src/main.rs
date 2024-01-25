@@ -2,7 +2,7 @@ use core::panic;
 
 use minifb::{Window, WindowOptions, Key, KeyRepeat, MouseButton, MouseMode};
 
-use sand_sim::{Simulation, PixelState};
+use sand_sim::{Simulation, Cell};
 
 fn main() {
 	if cfg!(debug_assertions) {
@@ -29,7 +29,7 @@ fn main() {
         if window.is_key_pressed(Key::R, KeyRepeat::No) {
             for y in 0..simulation.height {
                 for x in 0..simulation.width {
-                    simulation.grid[x + y * WIDTH] = PixelState::Empty;
+                    simulation.grid[x + y * WIDTH] = Cell::Empty;
                 }
             }
         }
@@ -41,10 +41,11 @@ fn main() {
                 let (window_width, window_height) = window.get_size();
                 let mouse_x = (mouse_x * (WIDTH as f32 / window_width as f32)) as i32;
                 let mouse_y = (mouse_y * (HEIGHT as f32 / window_height as f32)) as i32;
-                for y in mouse_y-4..mouse_y+4 {
-                    for x in mouse_x-4..mouse_x+4 {
+                let extend = if mouse_left { 15 } else { 5 };
+                for y in mouse_y-extend..mouse_y+extend {
+                    for x in mouse_x-extend..mouse_x+extend {
                         if x >= 0 && x < WIDTH as i32 && y >= 0 && y < HEIGHT as i32 {
-                            simulation.grid[x as usize + y as usize * WIDTH] = if mouse_left { PixelState::Sand } else { PixelState::Stone };
+                            simulation.grid[x as usize + y as usize * WIDTH] = if mouse_left { Cell::Sand } else { Cell::Stone };
                         }
                     }
                 }

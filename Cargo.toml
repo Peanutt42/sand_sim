@@ -7,3 +7,6 @@ edition = "2021"
 members = [
 	"sand_sim_editor",
 ]
+
+[dependencies]
+rand = "0.8.5"
