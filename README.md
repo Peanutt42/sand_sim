@@ -5,6 +5,7 @@ A library to simulate falling sand
 ### Controls
 - Sand: `1`
 - Stone: `2`
+- Water: `3`
 - Add: `Left mouse button`
 - Remove: `Right mouse button`
 - Reset: `R`

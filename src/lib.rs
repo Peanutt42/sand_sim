@@ -7,6 +7,7 @@ pub enum Cell {
 	Empty,
 	Sand,
 	Stone,
+	Water,
 }
 
 #[derive(Clone, Copy)]
@@ -38,13 +39,13 @@ impl Simulation {
 	}
 
 	fn update_pixel(&self, x: usize, y: usize) -> Option<CellMove> {
+		let index = x + y * self.width;
+
 		match self.grid[x + y * self.width] {
 			Cell::Sand => {
 				if y == self.height - 1 {
 					return None;
 				}
-
-				let index = x + y * self.width;
 
 				let below = index + self.width;
 				let below_left = below - 1;
@@ -69,6 +70,34 @@ impl Simulation {
 					None
 				}
 			},
+			Cell::Water => {
+				if y == self.height - 1 {
+					return None;
+				}
+
+				let below = index + self.width;
+				let left = index - 1;
+				let right = index + 1;
+				let can_go_left = x > 0 && self.is_empty(left);
+				let can_go_right = x + 1 < self.width && self.is_empty(right);
+				
+				if self.is_empty(below) {
+					Some(CellMove { destination: below as i32, source: index as i32 })
+				}
+				else if can_go_left && can_go_right {
+					let destination = if rand::random::<bool>() { left } else { right } as i32;
+                    Some(CellMove { destination, source: index as i32 })
+				}
+				else if can_go_left {
+                    Some(CellMove { destination: left as i32, source: index as i32 })
+                }
+				else if can_go_right {
+                    Some(CellMove { destination: right as i32, source: index as i32 })
+                }
+				else {
+					None
+				}
+			}
 			_ => None,
 		}
 	}
@@ -124,6 +153,8 @@ impl Simulation {
             }
 		}
 
+		changes.sort_by(|a, b| a.destination.cmp(&b.destination));
+
 		let mut thread_rng = rand::thread_rng();
 
 		let mut iprev = 0;
@@ -141,6 +172,12 @@ impl Simulation {
 		}
 	}
 
+
+	fn rgb(r: u8, g: u8, b: u8) -> u32 {
+		let (r, g, b) = (r as u32, g as u32, b as u32);
+		(r << 16) | (g << 8) | b
+	}
+
 	pub fn draw_to_buffer(&self, buffer: &mut Vec<u32>) {
 		buffer.resize(self.width * self.height, 0);
 
@@ -148,13 +185,16 @@ impl Simulation {
 			for x in 0..self.width {
 				match self.grid[x + y * self.width] {
                     Cell::Sand => {
-                        buffer[x + y * self.width] = 0xFFFFFFFF;
+                        buffer[x + y * self.width] = Self::rgb(255, 211, 130);
                     },
 					Cell::Stone => {
-                        buffer[x + y * self.width] = 0x999999FF;
+                        buffer[x + y * self.width] = Self::rgb(66, 66, 66);
 					},
-                    _ => {
-                        buffer[x + y * self.width] = 0;
+					Cell::Water => {
+						buffer[x + y * self.width] = Self::rgb(124, 207, 255);
+					},
+                    Cell::Empty => {
+                        buffer[x + y * self.width] = Self::rgb(0, 0, 0);
 					},
                 }
 			}

@@ -51,6 +51,9 @@ fn main() {
         if window.is_key_down(Key::Key2) {
             selected_cell_type = Cell::Stone;
         }
+        if window.is_key_down(Key::Key3) {
+            selected_cell_type = Cell::Water;
+        }
 
         let mouse_pos = window.get_mouse_pos(MouseMode::Clamp);
         let (window_width, window_height) = window.get_size();
