@@ -1,6 +1,8 @@
 # sand_sim
- 
-## Controls
+A library to simulate falling sand
+
+## sand_sim_editor
+### Controls
 - Sand: `Left mouse button`
 - Stone: `Right mouse button`
 - Reset: `R`
